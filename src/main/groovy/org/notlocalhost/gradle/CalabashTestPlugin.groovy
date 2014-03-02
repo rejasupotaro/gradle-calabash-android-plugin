@@ -10,6 +10,7 @@ import org.gradle.api.tasks.Exec
 
 class CalabashTestPlugin implements Plugin<Project> {
     private static final String TEST_TASK_NAME = 'calabash'
+    private static final String REPORT_FORMAT = 'xml'
 
     void apply(Project project) {
         def hasAppPlugin = project.plugins.hasPlugin AppPlugin
@@ -67,9 +68,10 @@ class CalabashTestPlugin implements Plugin<Project> {
             def os = System.getProperty("os.name").toLowerCase()
             if (os.contains("windows")) {
                 // you start commands in Windows by kicking off a cmd shell
-                testRunTask.commandLine "cmd", "/c", "calabash-android", "run", "${apkFile}", "--format", "html", "--out", outFile.canonicalPath
-            }  else { // assume Linux 
-                testRunTask.commandLine "calabash-android", "run", "${apkFile}", "--format", "html", "--out", outFile.canonicalPath
+                testRunTask.commandLine "cmd", "/c", "calabash-android", "run", "${apkFile}", "--format", REPORT_FORMAT, "--out", outFile.canonicalPath
+            }  else { // assume Linux
+                testRunTask.environment("SCREENSHOT_PATH", "${outFileDir}/")
+                testRunTask.commandLine "calabash-android", "run", "${apkFile}", "--format", REPORT_FORMAT, "--out", outFile.canonicalPath
             }
 
             testRunTask.doFirst {
